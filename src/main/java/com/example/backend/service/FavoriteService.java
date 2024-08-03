@@ -37,8 +37,8 @@ public class FavoriteService {
 
         Project project = projectRepository.findByProjectId(projectId);
 
-        project.updateFavoriteCount(-1);
         project.getProjectLike().remove(jwtService.getUserIdFromToken(servletRequest));
+        project.updateFavoriteCount(-1);
 
         return "프로젝트 찜하기 취소 완료";
 
@@ -59,8 +59,8 @@ public class FavoriteService {
 
         User user = peopleRepository.findUserByUserId(favoriteId);
 
-        user.updateFavoriteCount(-1);
         user.getUserLike().remove(jwtService.getUserIdFromToken(servletRequest));
+        user.updateFavoriteCount(-1);
 
         return "유저 찜하기 취소 완료";
 

@@ -1,21 +1,14 @@
 package com.example.backend.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.example.backend.common.response.PageApiResponse;
 import com.example.backend.common.util.RedisUtil;
 import com.example.backend.domain.User;
-import com.example.backend.domain.VerificationCode;
-import com.example.backend.dto.request.people.PeopleSearchDto;
 import com.example.backend.dto.request.people.UpdateUserRequestDto;
-import com.example.backend.dto.response.people.PeopleResponseDto;
 import com.example.backend.repository.people.PeopleRepository;
 import com.example.backend.repository.people.VerificationCodeRepository;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -80,11 +73,13 @@ public class PeopleService {
     public String sendVerificationCode(String email) {
 
         Random r = new Random();
-        String verificationCode = "";
+        StringBuilder verificationCodeBuilder = new StringBuilder();
 
         for(int i = 0; i < 6; i++) {
-            verificationCode += Integer.toString(r.nextInt(10));
+            verificationCodeBuilder = verificationCodeBuilder.append(Integer.toString(r.nextInt(10)));
         }
+
+        String verificationCode = verificationCodeBuilder.toString();
 
         String from = "matchmate25@gmail.com";
         String title = "[매치메이트] 인증 메일이 도착했습니다.";
@@ -95,7 +90,8 @@ public class PeopleService {
                         "<br><br>" +
                         "인증 번호를 제대로 입력해주세요";
 
-        /* redis 적용 전
+        /*
+         //redis 적용 전
         codeRepository.save(VerificationCode.builder()
                 .email(email)
                 .verificationCode(verificationCode)
@@ -126,15 +122,15 @@ public class PeopleService {
 
     public Boolean checkVerificationCode(String email, String code) {
 
-        /* redis 적용 전
+        //redis 적용 전
         String verificationCode = codeRepository.findByEmail(email).getVerificationCode();
 
         if (verificationCode.equals(code)) {
             codeRepository.deleteById(email);
             return true;
         }
-         */
 
+/*
         String verificationCode = redisUtil.getData(email);
 
         if (verificationCode.equals(code)) {
@@ -142,6 +138,8 @@ public class PeopleService {
             return true;
         }
 
+
+ */
 
         return false;
 

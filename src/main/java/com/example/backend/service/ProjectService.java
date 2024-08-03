@@ -41,9 +41,9 @@ public class ProjectService {
     public String postProject(ProjectRequestDto dto, MultipartFile file, HttpServletRequest servletRequest) throws IOException {
 
         List<Recruit> recruits = new ArrayList<>();
-
-        String position = "";
+        StringBuilder positionBuilder = new StringBuilder();
         String fileUrl = "";
+
         if(!file.isEmpty() && file != null) {
             fileUrl = awsS3Service.upload(file);
         }
@@ -69,10 +69,12 @@ public class ProjectService {
                     .currentCount(recruitDto.getCurrentCount())
                     .targetCount(recruitDto.getTargetCount())
                     .build());
-            position += recruitDto.getPosition() + ", ";
+            positionBuilder = positionBuilder.append(recruitDto.getPosition()).append(", ");
         }
 
-        project.updatePosition(position.substring(0, position.length() - 2));
+        String position = positionBuilder.length() > 0 ? positionBuilder.substring(0, positionBuilder.length() - 2) : "";
+
+        project.updatePosition(position);
         project.updateRecruit(recruits);
 
         projectRepository.save(project);
@@ -91,6 +93,7 @@ public class ProjectService {
 
     // 프로젝트 상세 정보 가져오기
     public ProjectDetailResponseDto findProject(Long projectId) {
+        projectRepository.updateViewCount(projectId);
         List<ProjectDetailResponseDto> content = projectRepository.findDetailByProjectId(projectId);
         return (content.isEmpty()) ? null : content.get(0);
     }
@@ -127,7 +130,7 @@ public class ProjectService {
 
         List<Recruit> recruits = project.getRecruits();
 
-        String position = "";
+        StringBuilder positionBuilder = new StringBuilder();
         String fileUrl = "";
 
         if(!file.isEmpty() && file != null) {
@@ -144,19 +147,15 @@ public class ProjectService {
                     .currentCount(recruitDto.getCurrentCount())
                     .targetCount(recruitDto.getTargetCount())
                     .build());
-            position += recruitDto.getPosition() + ", ";
+            positionBuilder = positionBuilder.append(recruitDto.getPosition()).append(", ");
         }
 
-        project.updateTitle(dto.getTitle());
-        project.updateProjectFileUrl(fileUrl);
-        project.updateDeadline(dto.getDeadline());
-        project.updateImportantQuestion(dto.getImportantQuestion());
-        project.updateSoftSkill(dto.getSoftSkill());
-        project.updateTechStack(dto.getTechStack());
-        project.updateDescription(dto.getDescription());
-        project.updateRecruit(recruits);
-        project.updatePosition(position.substring(0, position.length() - 2));
-        project.updateLastModifiedAt(LocalDateTime.now());
+        String position = positionBuilder.length() > 0 ? positionBuilder.substring(0, positionBuilder.length() - 2) : "";
+
+        project.updateProjectDetails(dto.getTitle(), fileUrl, dto.getDeadline(),
+                dto.getImportantQuestion(), dto.getSoftSkill(),
+                dto.getTechStack(), dto.getDescription(),
+                recruits, position, LocalDateTime.now());
 
         return "프로젝트 수정 완료";
 
@@ -180,7 +179,7 @@ public class ProjectService {
     }
 
     // 신규 스티커 여부 (생성한 후 1주일)
-    public List<ProjectResponseDto> checkRecent(List<ProjectResponseDto> projects){
+    private List<ProjectResponseDto> checkRecent(List<ProjectResponseDto> projects) {
         for (ProjectResponseDto project : projects) {
             boolean recent = !project.getCreatedAt().isBefore(LocalDateTime.now().minusDays(1));
             project.setRecent(recent);

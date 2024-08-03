@@ -57,12 +57,7 @@ public class JwtService {
     public String createRefreshToken(CustomOAuth2User customOAuth2User) {
         return buildToken(customOAuth2User, refreshExpiration, "R");
     }
-/*
-    public Boolean validToken(String token) {
-        Claims claims = getClaimsFromToken(token);
-        return claims.getExpiration().after(new Date());
-    }
- */
+
     public Boolean validToken(String token) {
         try {
             Claims claims = getClaimsFromToken(token);
@@ -71,7 +66,6 @@ public class JwtService {
             return false;
         }
     }
-
 
     public String reissueAccessToken(HttpServletRequest request) {
         String refreshToken = resolveToken(request);
@@ -101,7 +95,10 @@ public class JwtService {
     }
 
     public Claims getClaimsFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(getSignInKey()).build().parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder()
+                .setSigningKey(getSignInKey())
+                .build().parseClaimsJws(token)
+                .getBody();
     }
 
     public Long getUserIdFromToken(HttpServletRequest request) {

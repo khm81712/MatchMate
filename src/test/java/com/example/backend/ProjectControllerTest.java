@@ -27,6 +27,13 @@ public class ProjectControllerTest {
     PeopleRepository peopleRepository;
 
     @Test
+    void postProject() {
+
+
+
+    }
+
+    @Test
     public void jwtTest() {
 
         User user = peopleRepository.findUserByUserId(1L);

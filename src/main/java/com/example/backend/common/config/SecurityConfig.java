@@ -16,7 +16,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import java.util.Arrays;
 
 @Configuration
@@ -36,6 +35,11 @@ public class SecurityConfig {
         http
 
                 .csrf(csrf -> csrf.disable())
+
+                .headers(headers -> headers
+                        .addHeaderWriter(((request, response) -> {
+                            response.setHeader("Content-Security-Policy","default-src 'self' https://match-mate.store;");
+                        })))
 
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 

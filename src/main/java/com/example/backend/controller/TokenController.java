@@ -6,20 +6,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequiredArgsConstructor
-public class AuthController {
+public class TokenController {
 
     private final JwtService jwtService;
 
+    /*
     @GetMapping("/oauth2/success")
     public CommonApiResponse<?> oAuth2Success(@RequestParam("accessToken") String accessToken,
                                                              @RequestParam("refreshToken") String refreshToken) {
@@ -28,6 +25,7 @@ public class AuthController {
         tokens.put("refreshToken", refreshToken);
         return new CommonApiResponse<>(OK, tokens);
     }
+     */
 
     @GetMapping("/token")
     public CommonApiResponse<?> reissueAccessToken(HttpServletRequest request) {
