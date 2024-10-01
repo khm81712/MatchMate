@@ -10,11 +10,17 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 public class OAuthAttributes {
+
     private Map<String, Object> attributes; // OAuth2 반환하는 유저 정보 Map
+
     private String nameAttributeKey;
+
     private String registrationId;
+
     private String nickname;
+
     private String email;
+
     private String picture;
 
     public static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
@@ -28,6 +34,7 @@ public class OAuthAttributes {
     }
 
     private static OAuthAttributes ofKakao(String registrationId, String userNameAttributeName, Map<String, Object> attributes) {
+
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
 
@@ -39,6 +46,7 @@ public class OAuthAttributes {
                 .registrationId(registrationId)
                 .nameAttributeKey(userNameAttributeName)
                 .build();
+
     }
 
 }

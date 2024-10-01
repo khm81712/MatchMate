@@ -70,7 +70,7 @@ public class User {
 
     @Builder.Default
     @ElementCollection
-    @CollectionTable(name = "userLike", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "user_favorite", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "favorite_id")
     private Set<Long> userLike = new HashSet<>();
 

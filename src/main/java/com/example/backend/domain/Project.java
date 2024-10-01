@@ -1,6 +1,5 @@
 package com.example.backend.domain;
 
-import com.example.backend.dto.request.project.UpdateProjectRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -63,7 +62,7 @@ public class Project {
 
     @Builder.Default
     @ElementCollection
-    @CollectionTable(name = "projectLike", joinColumns = @JoinColumn(name = "project_id"))
+    @CollectionTable(name = "project_favorite", joinColumns = @JoinColumn(name = "project_id"))
     @Column(name = "user_id")
     private Set<Long> projectLike = new HashSet<>();
 
@@ -79,30 +78,28 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = ALL, orphanRemoval = true)
     private List<Recruit> recruits = new ArrayList<>();
 
-    public void updateRecruit(List<Recruit> recruits) {
+    public void update(String title, String projectFileUrl, LocalDate deadline,
+                       String importantQuestion, String softSkill, String techStack,
+                       String description, List<Recruit> recruits, String position,
+                       LocalDateTime lastModifiedAt) {
+        this.title = title;
+        this.projectFileUrl = projectFileUrl;
+        this.deadline = deadline;
+        this.importantQuestion = importantQuestion;
+        this.softSkill = softSkill;
+        this.techStack = techStack;
+        this.description = description;
         this.recruits = recruits;
+        this.position = position;
+        this.lastModifiedAt = lastModifiedAt;
     }
+
+    public void updateRecruit(List<Recruit> recruits) {this.recruits = recruits;}
 
     public void updateFavoriteCount(int count) {this.favoriteCount += count;}
 
-    public void addProjectLike(Long userId) {this.projectLike.add(userId);}
-
     public void updatePosition(String position) {this.position = position;}
 
-    public void updateTitle(String title) {this.title = title;}
-
-    public void updateProjectFileUrl(String projectFileUrl) {this.projectFileUrl = projectFileUrl;}
-
-    public void updateDeadline(LocalDate deadline) {this.deadline = deadline;}
-
-    public void updateTechStack(String techStack) {this.techStack = techStack;}
-
-    public void updateSoftSkill(String softSkill) {this.softSkill = softSkill;}
-
-    public void updateImportantQuestion(String importantQuestion) {this.importantQuestion = importantQuestion;}
-
-    public void updateDescription(String description) {this.description = description;}
-
-    public void updateLastModifiedAt(LocalDateTime lastModifiedAt) {this.lastModifiedAt = lastModifiedAt;}
+    public void addProjectLike(Long userId) {this.projectLike.add(userId);}
 
 }

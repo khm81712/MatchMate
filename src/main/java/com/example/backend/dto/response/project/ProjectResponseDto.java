@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @Builder
 @AllArgsConstructor
 @ToString
@@ -34,6 +33,10 @@ public class ProjectResponseDto {
     private LocalDateTime createdAt;
 
     private Boolean recent;
+
+    public void setRecent(Boolean recent) {
+        this.recent = recent;
+    }
 
     @QueryProjection
     public ProjectResponseDto(Long projectId, String nickname, String userFileUrl, String title, String techStack, String position, LocalDate deadline, int viewCount, int favoriteCount, LocalDateTime createdAt) {

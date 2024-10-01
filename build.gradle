@@ -62,6 +62,8 @@ dependencies {
 	//레디스 추가
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+	testRuntimeOnly 'com.h2database:h2'
+
 }
 
 // Querydsl 설정부

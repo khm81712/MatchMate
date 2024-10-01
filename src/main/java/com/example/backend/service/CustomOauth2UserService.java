@@ -58,6 +58,8 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
                     .createdAt(LocalDateTime.now())
                     .nickname(nickname)
                     .year("0년")
+                    .alarmStatus(false)
+                    .employmentStatus(false)
                     .build();
 
             peopleRepository.save(user);
