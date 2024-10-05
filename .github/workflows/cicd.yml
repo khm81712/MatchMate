@@ -2,7 +2,7 @@ name: Java CI/CD with Gradle
 
 on:
   pull_request:
-    branches: [ "cicd-test" ]
+    branches: [ "master" ]
   
 permissions:
   contents: read
