@@ -1,8 +1,9 @@
 package com.example.backend.service;
 
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.example.backend.common.response.PageApiResponse;
+import com.example.backend.common.util.RedisUtil;
 import com.example.backend.domain.Project;
+import com.example.backend.domain.ProjectRankingBackup;
 import com.example.backend.domain.Recruit;
 import com.example.backend.domain.User;
 import com.example.backend.dto.request.project.ProjectRequestDto;
@@ -10,6 +11,7 @@ import com.example.backend.dto.request.project.ProjectSearchDto;
 import com.example.backend.dto.request.project.RecruitRequestDto;
 import com.example.backend.dto.response.project.ProjectDetailResponseDto;
 import com.example.backend.dto.response.project.ProjectResponseDto;
+import com.example.backend.repository.project.ProjectRankingRepository;
 import com.example.backend.repository.project.ProjectRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.*;
@@ -36,10 +39,13 @@ import static org.springframework.http.HttpStatus.*;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
-    private final AmazonS3Client amazonS3Client;
+
+    private final ProjectRankingRepository projectRankingRepository;
+
     private final AwsS3Service awsS3Service;
     private final JwtService jwtService;
 
+    private final RedisUtil redisUtil;
     // 프로젝트 저장
     public String create(ProjectRequestDto dto, MultipartFile file, Authentication authentication) throws IOException {
 
@@ -110,6 +116,7 @@ public class ProjectService {
                 cookie.setMaxAge(leftSeconds.intValue());
                 cookie.setSecure(true);
                 response.addCookie(cookie);
+                redisUtil.incrementProjectRankingScore(projectId);
             }
         } else {
             projectRepository.updateViewCount(projectId);
@@ -118,8 +125,9 @@ public class ProjectService {
             newCookie.setMaxAge(leftSeconds.intValue());
             newCookie.setSecure(true);
             response.addCookie(newCookie);
+            redisUtil.incrementProjectRankingScore(projectId);
         }
-
+        redisUtil.incrementProjectRankingScore(projectId);
         List<ProjectDetailResponseDto> content = projectRepository.findDetailByProjectId(projectId);
 
         return (content.isEmpty()) ? null : content.get(0);
@@ -129,6 +137,26 @@ public class ProjectService {
     // 핫 프로젝트 목록 가져오기
     public List<ProjectResponseDto> findHotList(int size) {
         return checkRecent(projectRepository.findHotProjects(size));
+    }
+
+    // 핫 프로젝트 목록 가져오기 (redis)
+    public List<ProjectResponseDto> findRankingList() {
+
+        // redis에서 값 가져오기
+        List<ProjectResponseDto> projectCacheList = redisUtil.getProjectCacheList();
+
+        // 값이 없을 때 데이터베이스에서 값 가져와서 redis에 저장하기
+        if (projectCacheList == null) {
+            ProjectRankingBackup rankingBackup = projectRankingRepository.findTopByOrderByProjectRankingBackupIdDesc();
+            List<Long> rankingIdList = Arrays.stream(rankingBackup.getRankingCsv().split(", "))
+                    .map(s -> Long.parseLong(s))
+                    .toList();
+            projectCacheList = projectRepository.findResponseDtoAllById(rankingIdList);
+            redisUtil.projectCacheSave(projectCacheList);
+        }
+
+        return projectCacheList;
+
     }
 
     // 내가 찜한 프로젝트 목록 가져오기

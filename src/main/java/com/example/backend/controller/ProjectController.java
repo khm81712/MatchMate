@@ -48,4 +48,9 @@ public class ProjectController {
         return new CommonApiResponse<>(OK, projectService.findHotList(size));
     }
 
+    @GetMapping("/projects/ranking")
+    public CommonApiResponse<?> findRankingList() {
+        return new CommonApiResponse<>(OK, projectService.findRankingList());
+    }
+
 }

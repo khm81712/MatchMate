@@ -20,4 +20,6 @@ public interface ProjectRepositoryCustom {
 
     Page<ProjectResponseDto> findMyProjects(Long userId, Pageable pageable);
 
+    List<ProjectResponseDto> findResponseDtoAllById(List<Long> projectIds);
+
 }

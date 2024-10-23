@@ -21,6 +21,7 @@ public class TokenAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = jwtService.resolveToken(request);
         String requestUri = request.getRequestURI();
+        UsernamePasswordAuthenticationToken authentication;
 
         // oauth2 로그인 관련 주소
         if (requestUri.matches("^\\/login(?:\\/.*)?$") || requestUri.matches("^\\/oauth2(?:\\/.*)?$")) {
@@ -35,7 +36,8 @@ public class TokenAuthFilter extends OncePerRequestFilter {
                 response.getWriter().write("token has expired");
                 return;
             }
-            UsernamePasswordAuthenticationToken authentication = jwtService.getAuthentication(token);
+            // 리프레시 토큰은 정해진 api에서만 사용 가능하게 하기
+            authentication = !jwtService.getClaimsFromToken(token).getSubject().equals("R") ? jwtService.getAuthentication(token) : null;
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 

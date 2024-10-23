@@ -64,6 +64,8 @@ public class SecurityConfig {
                                 AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/peoples"),
                                 AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/peoples/**"), // /peoples/hot 포함
                                 AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users/nickname"),
+                                AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/scheduled-test"),
+                                AntPathRequestMatcher.antMatcher("/token"),
                                 AntPathRequestMatcher.antMatcher("/favicon.ico"),
                                 AntPathRequestMatcher.antMatcher("/error")
                         ).permitAll()
@@ -78,7 +80,8 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://match-mate.store", "http://localhost:3000"));
+        //configuration.setAllowedOrigins(Arrays.asList("https://match-mate.store", "http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Arrays.asList("*"));

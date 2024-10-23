@@ -15,6 +15,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.example.backend.domain.QProject.project;
 import static com.example.backend.domain.QRecruit.recruit;
@@ -87,6 +89,32 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom {
                 .orderBy(project.favoriteCount.add(project.viewCount).desc())//TODO 인기 순위 조건 생각하기
                 .limit(size)
                 .fetch();
+
+    }
+
+    @Override
+    public List<ProjectResponseDto> findResponseDtoAllById(List<Long> projectIds) {
+
+        List<ProjectResponseDto> result = queryFactory
+                .select(new QProjectResponseDto(
+                        project.projectId,
+                        project.user.nickname,
+                        project.user.userFileUrl,
+                        project.title,
+                        project.techStack,
+                        project.position,
+                        project.deadline,
+                        project.createdAt))
+                .from(project)
+                .where(project.projectId.in(projectIds))
+                .fetch();
+
+        Map<Long, ProjectResponseDto> resultMap = result.stream()
+                .collect(Collectors.toMap(ProjectResponseDto::getProjectId, dto -> dto));
+
+        return projectIds.stream()
+                .map(resultMap::get)
+                .collect(Collectors.toList());
 
     }
 

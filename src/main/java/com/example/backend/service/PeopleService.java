@@ -115,9 +115,9 @@ public class PeopleService {
 
     public Boolean checkVerificationCode(String email, String code) {
 
-        if (redisUtil.getData(email) == null) return false;
+        if (redisUtil.getData(email) == null || !redisUtil.getData(email).equals(code)) return false;
 
-        redisUtil.deleteDate(email);
+        redisUtil.deleteData(email);
 
         return true;
 

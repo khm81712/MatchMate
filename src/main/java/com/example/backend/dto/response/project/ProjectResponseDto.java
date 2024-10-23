@@ -52,4 +52,16 @@ public class ProjectResponseDto {
         this.createdAt = createdAt;
     }
 
+    @QueryProjection
+    public ProjectResponseDto(Long projectId, String nickname, String userFileUrl, String title, String techStack, String position, LocalDate deadline, LocalDateTime createdAt) {
+        this.projectId = projectId;
+        this.nickname = nickname;
+        this.userFileUrl = userFileUrl;
+        this.title = title;
+        this.techStack = techStack;
+        this.position = position;
+        this.deadline = deadline;
+        this.createdAt = createdAt;
+    }
+
 }
