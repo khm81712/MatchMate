@@ -1,7 +1,7 @@
 package com.example.backend.dto.response.project;
 
 import com.example.backend.dto.request.project.RecruitRequestDto;
-import lombok.AllArgsConstructor;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@AllArgsConstructor
 public class ProjectDetailResponseDto {
 
     private Long projectId;
@@ -46,6 +45,28 @@ public class ProjectDetailResponseDto {
 
     private LocalDateTime lastModifiedAt;
 
-    private List<RecruitRequestDto> recruit;
+    private List<RecruitRequestDto> recruits;
+
+    @QueryProjection
+    public ProjectDetailResponseDto(Long projectId, Long userId, String nickname, String userFileUrl, String projectFileUrl, String title, String techStack, String softSkill, String importantQuestion, LocalDate deadline, String recruitment, Boolean employmentStatus, int viewCount, int favoriteCount, String description, LocalDateTime createdAt, LocalDateTime lastModifiedAt, List<RecruitRequestDto> recruits) {
+        this.projectId = projectId;
+        this.userId = userId;
+        this.nickname = nickname;
+        this.userFileUrl = userFileUrl;
+        this.projectFileUrl = projectFileUrl;
+        this.title = title;
+        this.techStack = techStack;
+        this.softSkill = softSkill;
+        this.importantQuestion = importantQuestion;
+        this.deadline = deadline;
+        this.recruitment = recruitment;
+        this.employmentStatus = employmentStatus;
+        this.viewCount = viewCount;
+        this.favoriteCount = favoriteCount;
+        this.description = description;
+        this.createdAt = createdAt;
+        this.lastModifiedAt = lastModifiedAt;
+        this.recruits = recruits;
+    }
 
 }

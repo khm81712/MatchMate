@@ -3,6 +3,7 @@ package com.example.backend.common.config;
 import com.example.backend.common.filter.TokenAuthFilter;
 import com.example.backend.common.handler.OAuth2SuccessHandler;
 import com.example.backend.service.CustomOauth2UserService;
+import com.example.backend.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +17,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import java.util.Arrays;
 
 @Configuration
@@ -28,7 +28,7 @@ public class SecurityConfig {
 
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
-    private final TokenAuthFilter jwtAuthFilter;
+    private final JwtService jwtService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -39,34 +39,39 @@ public class SecurityConfig {
 
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .headers(headers -> headers
+                        .addHeaderWriter(((request, response) -> {
+                            response.setHeader("Content-Security-Policy","default-src 'self' https://match-mate.store;");
+                        })))
+
                 .formLogin(formLogin -> formLogin.disable())
 
                 .httpBasic(httpBasic -> httpBasic.disable())
 
                 .oauth2Login(oauth2 -> oauth2
-                        .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
+                        .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(oAuth2UserService))
                         .successHandler(oAuth2SuccessHandler))
 
-                .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(authorizeRequest -> authorizeRequest
                         .requestMatchers(
-                                new AntPathRequestMatcher("/"),
-                                new AntPathRequestMatcher("/oauth2/success"),
-                                new AntPathRequestMatcher("/projects", HttpMethod.GET.toString()),
-                                new AntPathRequestMatcher("/comments/**", HttpMethod.GET.toString()),
-                                new AntPathRequestMatcher("/projects/**"),
-                                new AntPathRequestMatcher("/projects/hot"),
-                                new AntPathRequestMatcher("/peoples"),
-                                new AntPathRequestMatcher("/peoples/**"),
-                                new AntPathRequestMatcher("/peoples/hot"),
-                                new AntPathRequestMatcher("/users/nickname")
+                                AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/projects"),
+                                AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/projects/**"), // /projects/hot 포함
+                                AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/comments/**"),
+                                AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/peoples"),
+                                AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/peoples/**"), // /peoples/hot 포함
+                                AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/users/nickname"),
+                                AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/scheduled-test"),
+                                AntPathRequestMatcher.antMatcher("/token"),
+                                AntPathRequestMatcher.antMatcher("/favicon.ico"),
+                                AntPathRequestMatcher.antMatcher("/error")
                         ).permitAll()
                         .anyRequest().authenticated())
 
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .addFilterBefore(new TokenAuthFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
 
@@ -75,10 +80,11 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://match-mate.store", "http://localhost:3000"));
+        //configuration.setAllowedOrigins(Arrays.asList("https://match-mate.store", "http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

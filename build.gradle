@@ -62,6 +62,11 @@ dependencies {
 	//레디스 추가
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+	testRuntimeOnly 'com.h2database:h2'
+
+	//jackson-datatype-jsr310 (java.time 직렬화, 역직렬화에 필요)
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
+
 }
 
 // Querydsl 설정부
@@ -82,6 +87,6 @@ clean {
 	delete file(generated)
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
 }

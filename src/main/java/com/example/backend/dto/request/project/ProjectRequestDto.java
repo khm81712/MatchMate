@@ -1,12 +1,13 @@
 package com.example.backend.dto.request.project;
 
+import lombok.Builder;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Getter
+@Builder
 public class ProjectRequestDto {
 
     private String title;

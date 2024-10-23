@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @Builder
 @AllArgsConstructor
 @ToString
@@ -35,6 +34,10 @@ public class ProjectResponseDto {
 
     private Boolean recent;
 
+    public void setRecent(Boolean recent) {
+        this.recent = recent;
+    }
+
     @QueryProjection
     public ProjectResponseDto(Long projectId, String nickname, String userFileUrl, String title, String techStack, String position, LocalDate deadline, int viewCount, int favoriteCount, LocalDateTime createdAt) {
         this.projectId = projectId;
@@ -46,6 +49,18 @@ public class ProjectResponseDto {
         this.deadline = deadline;
         this.viewCount = viewCount;
         this.favoriteCount = favoriteCount;
+        this.createdAt = createdAt;
+    }
+
+    @QueryProjection
+    public ProjectResponseDto(Long projectId, String nickname, String userFileUrl, String title, String techStack, String position, LocalDate deadline, LocalDateTime createdAt) {
+        this.projectId = projectId;
+        this.nickname = nickname;
+        this.userFileUrl = userFileUrl;
+        this.title = title;
+        this.techStack = techStack;
+        this.position = position;
+        this.deadline = deadline;
         this.createdAt = createdAt;
     }
 
